@@ -1,8 +1,11 @@
 import React from 'react'
+import Banner from '../../components/Header/Banner/Banner'
 
 function Homepage() {
   return (
-    <div>Homepage</div>
+    <div className='homepage-container'>
+        <Banner />
+    </div>
   )
 }
 
