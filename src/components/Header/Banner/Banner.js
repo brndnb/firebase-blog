@@ -1,32 +1,33 @@
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import "./Banner.css"
 import {db} from '../../../config/firebaseConfig'
 //need some functions from firestore
-import {collection, getDocs, query, orderBy, limit} from "firebase/firestore"
+import {collection, getDocs, query, orderBy, limit} from 'firebase/firestore'
+//import { FaRegArrowAltCircleLeft } from 'react-icons/fa'
 
 
-//This component will show five articles most recent
+//this component will show the 5 most recent articles
 function Banner() {
 
     //create state
-    const [mainArticle, setMainArticle] = useState('')
-    const [otherArticles, setOtherArticles] = useState([])
-
-    //get data when page loads
-    useEffect(
-        ()=> {
+    const [mainArticle, setMainArticle] = React.useState('')
+    const [otherArticles, setOtherArticles] = React.useState([])
+    //get data when the page loads
+    React.useEffect(
+        ()=>{
             //make a reference to articles collection
             const articleRef = collection(db, 'articles')
 
-            //set up query to filter data
-            const q = query(articleRef, orderBy("createdAt", 'desc'),limit(5))
+            //set up query to filter the data
+            const q = query(articleRef, orderBy("createdAt", "desc"),limit(5))
             //retrieve documents from this collection
+            //getDocs(articleRef)
             getDocs(q,articleRef)
-            // getDocs(articleRef)
-            .then(res => {
+            .then(res =>{
                 console.log(res.docs[0].data())
-
-                const articles = res.docs.map(item => (
+                //this is needed to add the id
+                //and create an array that you can use for state
+                const articles = res.docs.map(item =>(
                     {
                         id: item.id,
                         ...item.data()
@@ -35,34 +36,39 @@ function Banner() {
                 console.log(articles)
                 //store in state
                 setMainArticle(articles[0])
-                //put the rest in otherArticles
-                setOtherArticles((articles.splice(1)))
+                //put the rest in the otherArticles
+                setOtherArticles(articles.splice(1))
             })
             .catch(err => console.log(err))
-        },[]
 
+
+        }, []
     )
   return (
-    <div className='banner-container'>
-        <div className='main-article-container' style={{backgroundImage:`url(${mainArticle?.imageUrl})`}}>
-            <div className='banner-info'>
+    <div className="banner-container">
+        <div className="main-article-container"
+            style={{backgroundImage:`url(${mainArticle?.imageUrl})`}}>
+            <div className="banner-info">
                 <h2>{mainArticle?.title}</h2>
-                <p>{mainArticle.createdAt?.toDate().toDateString()}</p>
+                <p>{mainArticle?.createdAt?.toDate().toDateString()}</p>
             </div>
+
         </div>
-        <div className='other-articles-container'>
+        <div className="other-articles-container">
             {
-                otherArticles.map(item => (
-                    <div className='other-article-item' key={item?.id} style={{backgroundImage:`url(${item?.imageUrl})`}}>
-                        <div className='banner-info'>
+                otherArticles.map(item =>(
+                    <div className="other-article-item" 
+                         key={item?.id} style={{backgroundImage:`url(${item?.imageUrl})`}}>
+                        <div className="banner-info">
                             <h3>{item?.title}</h3>
                             <small>{item?.createdAt?.toDate().toDateString()}</small>
                         </div>
                     </div>
-                ) )
+                ))
             }
 
         </div>
+
     </div>
   )
 }
